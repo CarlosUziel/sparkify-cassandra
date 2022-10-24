@@ -133,6 +133,24 @@ The following is a complete example of one of the queries showcased in `notebook
 **Get artist, song title and song's length in the music app history that was heard during sessionId = 338, and itemInSession = 4:**
 
 ```python
+from cassandra.cluster import Cluster
+from cql_queries import *
+
+# 0. Connect to Cassandra cluster
+try:
+    cluster = Cluster(
+        ["127.0.0.1"]
+    )  # If you have a locally installed Apache Cassandra instance
+    session = cluster.connect()
+except Exception as e:
+    print(e)
+
+try:
+    session.set_keyspace("sparkify")
+except Exception as e:
+    print(e)
+
+
 # 1. Define PK columns
 pk_cols = ("sessionId", "itemInSession")
 sorted_cols = [*pk_cols, *(c for c in data_df.columns if c not in pk_cols)]
