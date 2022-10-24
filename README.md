@@ -118,6 +118,13 @@ sudo systemctl stop cassandra && sudo systemctl start cassandra
 nodetool status
 ```
 
+When needed, Cassandra can be reloaded like so:
+```bash
+sudo systemctl stop cassandra
+sudo systemctl start cassandra
+sudo systemctl status cassandra
+```
+
 ## Usage
 
 Project structure:
@@ -134,8 +141,10 @@ The following is a complete example of one of the queries showcased in `notebook
 
 ```python
 from cassandra.cluster import Cluster
-from cql_queries import *
+from tqdm.rich import tqdm
+from IPython.core import display as ICD
 
+from cql_queries import *
 # 0. Connect to Cassandra cluster
 try:
     cluster = Cluster(
@@ -151,20 +160,25 @@ except Exception as e:
     print(e)
 
 
-# 1. Define PK columns
+# 1. Define table columns of interest
 pk_cols = ("sessionId", "itemInSession")
-sorted_cols = [*pk_cols, *(c for c in data_df.columns if c not in pk_cols)]
+select_cols = ("artist", "song", "length")
+sorted_cols = [
+    *pk_cols,
+    *select_cols,
+]
 
 # 2. Create table
 session.execute(
     get_create_table_query(
         "session_library",
-        common_columns + [f"PRIMARY KEY ({', '.join(pk_cols)})"],
+        [c for c in common_columns if c.split(" ")[0] in sorted_cols]
+        + [f"PRIMARY KEY ({', '.join(pk_cols)})"],
     )
 )
 
 # 3. Insert rows
-for index, row in data_df.iterrows():
+for index, row in tqdm(data_df.iterrows(), total=len(data_df)):
     try:
         session.execute(
             get_simple_insert_query("session_library", sorted_cols),
@@ -174,8 +188,6 @@ for index, row in data_df.iterrows():
         print(e)
 
 # 4. Select query
-select_cols = ("artist", "song", "length")
-
 rows = session.execute(
     get_simple_select_query(
         "session_library",
@@ -184,8 +196,9 @@ rows = session.execute(
     )
 )
 
-for row in rows:
-    print([getattr(row, c.lower()) for c in select_cols])
+ICD.display(
+    pd.DataFrame([{c: getattr(row, c.lower()) for c in select_cols} for row in rows])
+)
 ```
 
 *Output:*
