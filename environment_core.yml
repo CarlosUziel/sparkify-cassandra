@@ -1,0 +1,17 @@
+name: sparkify_cassandra
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - pandas
+  - jupyterlab
+  - ipython-sql
+  - black
+  - isort
+  - autoflake
+  - tqdm
+  - rich
+  - ipywidgets
+  - cassandra-driver
+prefix: /home/uziel/miniconda3/envs/bioinfo/envs/sparkify_cassandra
