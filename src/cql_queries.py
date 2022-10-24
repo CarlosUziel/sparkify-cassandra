@@ -27,9 +27,6 @@ def get_simple_insert_query(table_name: str, columns: Iterable[str]) -> str:
     Args:
        table_name: table name.
        columns: Columns into which to insert row data.
-       conflict_cols: if there is a conflict in these columns, do something.
-       conflict_do: what to do in case of conflict.
-       update_cols: if update on conflict, what columns to update.
     """
     return (
         f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES "
