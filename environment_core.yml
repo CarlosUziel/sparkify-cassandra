@@ -14,4 +14,8 @@ dependencies:
   - rich
   - ipywidgets
   - cassandra-driver
+  - ca-certificates
+  - certifi
+  - openssl
+  - black-jupyter
 prefix: /home/uziel/miniconda3/envs/bioinfo/envs/sparkify_cassandra
